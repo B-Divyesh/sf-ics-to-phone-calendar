@@ -1,5 +1,22 @@
 # Build handoff — ICS Rescue
 
+## Post-deploy repair verification — 2026-08-27
+
+The factory's final post-deploy request for builder commit `eefd8d97bd64fa4f953cca644b69f520821b54d5` recorded status `000` after the Static Web Apps upload had succeeded and the custom domain had already reported `Ready`/briefly returned HTTPS 200. This was a transient managed TLS/DNS convergence result, not an application or deployment defect:
+
+- Reproduced against `https://ics-to-phone-calendar.sociobot.in` after convergence: HTTPS **200**, valid TLS (`ssl_verify_result=0`), expected current HTML/assets, and the configured CSP/security headers.
+- Five further independent HTTPS requests all returned **200** (46 ms–1.97 s) with valid TLS.
+- `/opt/fleet/lib/verify-url.sh https://ics-to-phone-calendar.sociobot.in <temporary evidence directory>` passed: browser load 864 ms, zero console/page errors, title present, `lang=en`, one `h1`, a `main` landmark, zero images missing `alt`, and zero unlabeled buttons.
+- A separate live 390 × 844 Chromium scan using Playwright Axe found zero serious/critical violations and zero browser console/page errors.
+- No source or deployment-config defect was found. The only committed change for this repair is this evidence record; the factory deploy path may safely reassert the same static deployment.
+
+Clean local verification performed for this repair:
+
+- `npm ci && npm test && npm run build`: passed; Vitest **8/8** passed and `dist/` was produced. Main initial JS is 18.59 KB uncompressed (7.67 KB gzip); the deferred QR chunk is 25.84 KB; CSS is 15.71 KB.
+- `npm run test:e2e`: **5 passed, 1 intentionally skipped**. Chromium desktop and iPhone 13/390 px functional checks cover paste and file import, malformed/missing-end repair, recurrence, Windows-to-IANA time-zone repair, fixed ICS download, Apple/Google/Outlook actions, QR rendering, mobile overflow, browser console errors, and Axe scans in both empty and populated states. Unit coverage separately exercises malformed input, multiple events, recurrence, time zones, VTIMEZONE preservation, and alarms.
+
+The Chromium browser binary was absent in the disposable verification container initially and was installed with `npx playwright install chromium`; this was test-environment setup only and does not affect the repository or shipped site.
+
 ## What shipped
 
 - A production Vite + vanilla TypeScript static app for dropped, selected, or pasted ICS calendars.
