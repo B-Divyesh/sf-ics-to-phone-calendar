@@ -1,0 +1,8 @@
+{
+  "generator": "Azure AI Foundry via /opt/fleet/lib/gen-image.sh",
+  "deployment": "factory-image",
+  "generated_on": "2026-08-27",
+  "use_case": "stylized-concept",
+  "prompt": "Surreal editorial still life for a privacy-first web utility. A folded ivory calendar event card passes through a small vermilion circular portal and emerges inside a deep midnight-blue smartphone-shaped garden, where tiny paper moons, clock hands, and moss-green leaves grow in orderly calendar squares. Tactile cut-paper, painted plaster, subtle grain, crisp sculptural shadows, warm museum light, poetic but precise, palette of parchment cream, coral red, midnight navy, cobalt and moss. Landscape composition with visual interest on the right and calm negative space on the left, no people. No text, no numbers, no interface labels, no logos, no watermark, no recognizable brands, no gradients, no neon, no generic 3D app icons.",
+  "review": "Accepted: no text artifacts, people, brands, or misleading interface; paper path and calendar garden are clear."
+}

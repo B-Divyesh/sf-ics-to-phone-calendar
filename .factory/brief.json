@@ -1,0 +1,10 @@
+{
+  "slug": "ics-to-phone-calendar",
+  "title": "Paste-an-ICS, get one-tap add-to-calendar links (iPhone-safe)",
+  "user": "iPhone users and people sending them invites when iOS previews an ICS file but will not import it",
+  "job": "Turn an existing ICS file into reliable, one-tap calendar actions without exposing calendar contents",
+  "smallest_useful_product": "A local-only static page that accepts dropped, selected, or pasted ICS, repairs common defects, lists all events, and offers Apple-compatible ICS downloads plus Google and Outlook links per event, a fixed multi-event ICS export, and QR transfer.",
+  "privacy": "Calendar contents stay in the browser; no accounts, uploads, tracking, or third-party runtime services.",
+  "artifact_class": "static-web",
+  "monetization": "free"
+}
