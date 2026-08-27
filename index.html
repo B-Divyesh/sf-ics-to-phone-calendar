@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f4ecdd" />
+    <meta name="description" content="Repair an ICS file locally and add its events to Apple, Google, or Outlook Calendar." />
+    <title>ICS Rescue — Add an ICS event to your phone calendar</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to calendar converter</a>
+    <header class="site-header" aria-label="Site header">
+      <a class="wordmark" href="/" aria-label="ICS Rescue home">
+        <svg aria-hidden="true" viewBox="0 0 36 36"><path d="M9 5v5m18-5v5M6 14h24M8 8h20a2 2 0 0 1 2 2v18a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2Z"/><path d="m13 22 3 3 7-8"/></svg>
+        <span>ICS <em>Rescue</em></span>
+      </a>
+      <a class="privacy-link" href="#privacy-note">Private by design</a>
+    </header>
+
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span aria-hidden="true">✦</span> Your event has somewhere to go</p>
+          <h1 id="hero-title">Turn a stuck <span>.ics</span> into a calendar event.</h1>
+          <p class="lede">Drop or paste the invite. We repair common file problems and give you clean Apple, Google, and Outlook actions—right here on your device.</p>
+          <ul class="trust-list" aria-label="Product benefits">
+            <li><span aria-hidden="true">✓</span> Nothing is uploaded</li>
+            <li><span aria-hidden="true">✓</span> Multiple events welcome</li>
+            <li><span aria-hidden="true">✓</span> Time zones preserved</li>
+          </ul>
+        </div>
+        <picture class="hero-art">
+          <source type="image/avif" srcset="/hero-calendar-portal-768.avif 768w, /hero-calendar-portal-1280.avif 1280w" sizes="(max-width: 760px) 92vw, 48vw" />
+          <source type="image/webp" srcset="/hero-calendar-portal-768.webp 768w, /hero-calendar-portal-1280.webp 1280w" sizes="(max-width: 760px) 92vw, 48vw" />
+          <img src="/hero-calendar-portal-768.jpg" width="768" height="512" alt="A paper calendar slips through a coral portal into a phone-shaped night garden" decoding="async" fetchpriority="high" />
+        </picture>
+      </section>
+
+      <section class="converter" aria-labelledby="converter-title">
+        <div class="section-heading">
+          <p class="step-label">01 / Bring the invite</p>
+          <h2 id="converter-title">Open your calendar file</h2>
+          <p>Choose the route that is easiest on this device.</p>
+        </div>
+
+        <div id="offline-notice" class="offline-notice" role="status" hidden>
+          <span aria-hidden="true">◌</span>
+          You’re offline. File repair and Apple downloads still work; Google and Outlook open when you reconnect.
+        </div>
+
+        <div id="import-panel" class="import-panel">
+          <div id="drop-zone" class="drop-zone">
+            <input id="file-input" type="file" accept=".ics,text/calendar" />
+            <div class="drop-icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48"><path d="M10 8h28v32H10z"/><path d="M16 5v8m16-8v8M10 17h28M17 28h14m-7-7v14"/></svg>
+            </div>
+            <h3 id="drop-title">Drop your .ics here</h3>
+            <p>or choose it from Files, Mail, or Downloads</p>
+            <label class="button primary" for="file-input">Choose an ICS file</label>
+            <p class="file-note">Up to 2 MB · stays on this device</p>
+          </div>
+
+          <div class="or-line"><span>or paste its text</span></div>
+
+          <div class="paste-group">
+            <label for="ics-text">ICS calendar text</label>
+            <textarea id="ics-text" rows="7" spellcheck="false" autocapitalize="off" placeholder="BEGIN:VCALENDAR&#10;VERSION:2.0&#10;BEGIN:VEVENT&#10;…"></textarea>
+            <button id="parse-button" class="button secondary" type="button">Read pasted calendar</button>
+          </div>
+        </div>
+
+        <div id="error-box" class="message error-message" role="alert" tabindex="-1" hidden>
+          <span class="message-icon" aria-hidden="true">!</span>
+          <div><strong>We couldn’t read that calendar.</strong><p id="error-text"></p></div>
+          <button id="error-close" type="button" aria-label="Dismiss error">×</button>
+        </div>
+
+        <section id="results" class="results" aria-labelledby="results-title" hidden>
+          <div class="results-heading">
+            <div>
+              <p class="step-label">02 / Choose a calendar</p>
+              <h2 id="results-title">Your events are ready</h2>
+              <p id="results-summary" class="results-summary" aria-live="polite"></p>
+            </div>
+            <button id="start-over" class="text-button" type="button">Start over</button>
+          </div>
+          <div id="repair-summary" class="message success-message" role="status"></div>
+          <div id="event-list" class="event-list"></div>
+          <div class="all-actions">
+            <div>
+              <h3>Need the whole calendar?</h3>
+              <p>Keep every event and repair in one clean file.</p>
+            </div>
+            <button id="download-all" class="button secondary" type="button">Download fixed .ics</button>
+            <button id="share-all" class="button quiet" type="button" hidden>Share fixed .ics</button>
+          </div>
+        </section>
+      </section>
+
+      <section id="privacy-note" class="privacy-note" aria-labelledby="privacy-title">
+        <div class="privacy-orbit" aria-hidden="true"><span></span></div>
+        <div>
+          <p class="step-label">A quiet promise</p>
+          <h2 id="privacy-title">Your plans never leave the room.</h2>
+          <p>This converter runs entirely in your browser. We do not upload, store, inspect, or track calendar contents. Google and Outlook receive event details only if you choose their link.</p>
+        </div>
+      </section>
+
+      <section class="how-it-works" aria-labelledby="how-title">
+        <div class="section-heading"><p class="step-label">What happens</p><h2 id="how-title">A small repair, not a sync.</h2></div>
+        <ol>
+          <li><span>1</span><div><h3>Read locally</h3><p>Your browser opens the text. No account or upload.</p></div></li>
+          <li><span>2</span><div><h3>Mend safely</h3><p>We normalize line endings, missing end times, IDs, and common time-zone names.</p></div></li>
+          <li><span>3</span><div><h3>Hand it onward</h3><p>Use a provider link, scan a QR, or keep the repaired ICS.</p></div></li>
+        </ol>
+      </section>
+    </main>
+
+    <dialog id="qr-dialog" aria-labelledby="qr-title">
+      <button id="qr-close" class="dialog-close" type="button" aria-label="Close QR code">×</button>
+      <p class="step-label">Phone handoff</p>
+      <h2 id="qr-title">Scan to add in Google Calendar</h2>
+      <p id="qr-event-name"></p>
+      <div id="qr-canvas" class="qr-canvas" aria-label="QR code"></div>
+      <p class="dialog-note">The event is encoded in this QR. It is generated on this device and not uploaded by us.</p>
+    </dialog>
+
+    <footer>
+      <div class="footer-brand"><span>ICS <em>Rescue</em></span><p>A tiny local-first tool from the Sociobot utility garden.</p></div>
+      <nav aria-label="Footer"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://sociobot.in">Sociobot</a></nav>
+      <p class="generated-note">Hero artwork was generated for this product with AI.</p>
+    </footer>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "name": "ICS Rescue",
+  "short_name": "ICS Rescue",
+  "description": "Repair an ICS file locally and add it to your phone calendar.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4ecdd",
+  "theme_color": "#f4ecdd",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
