@@ -84,6 +84,7 @@ img { display: block; max-width: 100%; }
 }
 .wordmark svg { width: 31px; fill: none; stroke: currentColor; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; }
 .wordmark em, .footer-brand em { color: var(--coral-deep); font-family: var(--serif); font-weight: 400; }
+.footer-brand em { color: #f3a497; }
 .privacy-link { min-height: 44px; display: inline-flex; align-items: center; color: var(--slate); font-size: 15px; text-underline-offset: 4px; }
 
 main { overflow: clip; }
@@ -197,6 +198,7 @@ h2 { margin: 0; font-family: var(--serif); font-size: clamp(2rem, 4vw, 3.1rem); 
 .button.google:hover { background: #173e70; }
 .button.outlook { color: #fff; background: #315c83; }
 .button.outlook:hover { background: #244865; }
+.button[aria-disabled="true"] { opacity: .58; cursor: not-allowed; }
 .button.apple { color: #fff; background: var(--night); }
 
 .or-line { display: flex; align-items: center; gap: 14px; margin: 25px 8px; color: var(--slate); font-size: 13px; text-transform: uppercase; letter-spacing: .1em; }
@@ -302,11 +304,11 @@ footer a { min-height: 44px; display: inline-flex; align-items: center; text-und
   .site-header, .hero, .converter, .privacy-note, .how-it-works { width: min(100% - 32px, 100% - env(safe-area-inset-left) - env(safe-area-inset-right) - 24px); }
   .site-header { height: 68px; }
   .privacy-link { font-size: 13px; }
-  .hero { min-height: 0; gap: 40px; padding: 48px 0 72px; }
-  .hero-art { width: calc(100% + 16px); }
-  .hero-art img { border-radius: 26% 6px 26% 6px / 8% 18px 8% 18px; }
+  .hero { min-height: 0; gap: 28px; padding: 40px 0 48px; }
+  .hero-art { width: calc(100% + 16px); height: 150px; }
+  .hero-art img { height: 150px; object-position: 58% 56%; border-radius: 26% 6px 26% 6px / 20% 18px 20% 18px; }
   .trust-list { display: grid; gap: 7px; }
-  .converter { padding: 72px 0 90px; }
+  .converter { padding: 48px 0 90px; }
   .import-panel { padding: 10px; border-radius: 20px; box-shadow: 6px 6px 0 rgba(23,40,59,.07); }
   .drop-zone { min-height: 320px; padding-inline: 16px; }
   .paste-group { display: flex; flex-direction: column; align-items: stretch; padding-inline: 2px; }

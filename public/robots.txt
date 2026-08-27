@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ics-to-phone-calendar.sociobot.in/sitemap.xml

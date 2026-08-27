@@ -24,7 +24,7 @@ self.addEventListener('fetch', (event) => {
     const fresh = fetch(event.request).then((response) => {
       if (response.ok) caches.open(CACHE).then((cache) => cache.put(event.request, response.clone()));
       return response;
-    }).catch(() => cached ?? (event.request.mode === 'navigate' ? caches.match('/') : undefined));
+    }).catch(async () => cached ?? (event.request.mode === 'navigate' ? caches.match('/') : Response.error()));
     return cached ?? fresh;
   }));
 });

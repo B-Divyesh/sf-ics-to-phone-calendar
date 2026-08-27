@@ -85,7 +85,29 @@ function actionLink(label: string, href: string, className: string): HTMLAnchorE
   link.target = '_blank';
   link.rel = 'noopener noreferrer';
   link.textContent = label;
+  link.addEventListener('click', (event) => {
+    if (!navigator.onLine) {
+      event.preventDefault();
+      offlineNotice.hidden = false;
+      offlineNotice.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  });
   return link;
+}
+
+async function shareOrDownloadEvent(event: CalendarEvent): Promise<void> {
+  const content = eventIcs(event);
+  const filename = safeFilename(event.summary);
+  const file = new File([content], filename, { type: 'text/calendar' });
+  try {
+    if (navigator.canShare?.({ files: [file] })) {
+      await navigator.share({ title: event.summary, files: [file] });
+      return;
+    }
+  } catch (error) {
+    if ((error as DOMException).name === 'AbortError') return;
+  }
+  download(content, filename);
 }
 
 function dateStamp(event: CalendarEvent): HTMLDivElement {
@@ -152,7 +174,7 @@ function eventCard(event: CalendarEvent, index: number): HTMLElement {
   apple.type = 'button';
   apple.className = 'button apple';
   apple.append(svgIcon('apple'), document.createTextNode('Add to Apple'));
-  apple.addEventListener('click', () => download(eventIcs(event), safeFilename(event.summary)));
+  apple.addEventListener('click', () => shareOrDownloadEvent(event));
   actions.append(apple);
   actions.append(actionLink('Open in Google', googleUrl(event), 'google'));
   actions.append(actionLink('Open in Outlook', outlookUrl(event), 'outlook'));
@@ -167,7 +189,9 @@ function eventCard(event: CalendarEvent, index: number): HTMLElement {
   actions.append(qr);
   const providerNote = document.createElement('p');
   providerNote.className = 'provider-note';
-  providerNote.textContent = event.rrule ? 'Apple and Google preserve the repeat rule. Outlook opens the first occurrence for review.' : 'Every service lets you review before saving.';
+  providerNote.textContent = event.rrule
+    ? 'Apple and Google preserve the repeat rule. Outlook opens the first occurrence for review.'
+    : 'Apple uses your phone’s share/download flow; iOS may ask you to confirm once more.';
   actions.append(providerNote);
   article.append(actions);
   return article;

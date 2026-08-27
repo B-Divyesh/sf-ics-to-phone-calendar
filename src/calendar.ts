@@ -14,6 +14,7 @@ export type CalendarEvent = {
   url: string;
   rrule?: string;
   sourceLines: string[];
+  timezoneBlocks: string[][];
   repairs: string[];
 };
 
@@ -99,25 +100,32 @@ function validIanaZone(zone: string): boolean {
   }
 }
 
-function repairZone(zone: string): { zone: string; changed: boolean } {
+function repairZone(zone: string): { zone?: string; changed: boolean } {
   const clean = zone.replace(/^\/(?:mozilla\.org\/[^/]+\/)?/, '');
   if (validIanaZone(clean)) return { zone: clean, changed: clean !== zone };
-  const mapped = WINDOWS_ZONES[zone] ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? 'UTC';
-  return { zone: validIanaZone(mapped) ? mapped : 'UTC', changed: true };
+  const mapped = WINDOWS_ZONES[zone];
+  return { ...(mapped ? { zone: mapped } : {}), changed: true };
 }
 
 function normalizeDate(prop: Property, repairs: string[]): CalendarDate {
   const raw = prop.value.trim();
   const allDay = prop.params.VALUE?.toUpperCase() === 'DATE' || /^\d{8}$/.test(raw);
-  let tzid = prop.params.TZID;
+  let tzid: string | undefined = prop.params.TZID;
   if (tzid) {
     const repaired = repairZone(tzid);
     if (repaired.changed) {
-      repairs.push(`Changed time zone “${tzid}” to “${repaired.zone}”.`);
+      repairs.push(repaired.zone
+        ? `Changed time zone “${tzid}” to “${repaired.zone}”.`
+        : `Removed the unrecognized time zone “${tzid}”; review this event’s local time before saving.`);
       tzid = repaired.zone;
     }
   }
   if (!/^\d{8}(T\d{6}Z?)?$/.test(raw)) throw new Error(`A date has an unsupported value: ${raw || 'empty'}.`);
+  const [year, month, day, hour, minute, second] = parts(raw);
+  const check = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+  if (check.getUTCFullYear() !== year || check.getUTCMonth() !== month - 1 || check.getUTCDate() !== day || hour > 23 || minute > 59 || second > 59) {
+    throw new Error(`A date is not valid: ${raw}. Check the day and time in the source invite.`);
+  }
   return { raw, allDay, ...(tzid ? { tzid } : {}) };
 }
 
@@ -181,10 +189,17 @@ function serializeDate(name: string, date: CalendarDate): string {
 
 function serializeEvent(event: CalendarEvent): string[] {
   const ignored = new Set(['BEGIN', 'END', 'DTSTART', 'DTEND', 'DURATION', 'SUMMARY', 'UID', 'LOCATION', 'DESCRIPTION', 'URL', 'RRULE']);
-  const preserved = event.sourceLines.filter((line) => {
+  const preserved: string[] = [];
+  let nestedDepth = 0;
+  for (const line of event.sourceLines) {
     const property = parseProperty(line);
-    return property && !ignored.has(property.name);
-  });
+    if (!property) continue;
+    if (nestedDepth > 0 || property.name === 'BEGIN') {
+      preserved.push(line);
+      if (property.name === 'BEGIN') nestedDepth += 1;
+      if (property.name === 'END') nestedDepth -= 1;
+    } else if (!ignored.has(property.name)) preserved.push(line);
+  }
   const lines = [
     'BEGIN:VEVENT',
     `UID:${escapeText(event.uid)}`,
@@ -202,6 +217,15 @@ function serializeEvent(event: CalendarEvent): string[] {
 
 function serializeCalendar(events: CalendarEvent[]): string {
   const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Sociobot//ICS Rescue//EN', 'CALSCALE:GREGORIAN'];
+  const neededZones = new Set(events.flatMap((event) => [event.start.tzid, event.end.tzid]).filter(Boolean));
+  const seenZones = new Set<string>();
+  for (const block of events.flatMap((event) => event.timezoneBlocks)) {
+    const tzid = block.map(parseProperty).find((property) => property?.name === 'TZID')?.value;
+    if (tzid && neededZones.has(tzid) && !seenZones.has(tzid)) {
+      lines.push(...block);
+      seenZones.add(tzid);
+    }
+  }
   for (const event of events) lines.push(...serializeEvent(event));
   lines.push('END:VCALENDAR');
   return `${lines.map(fold).join('\r\n')}\r\n`;
@@ -215,9 +239,18 @@ export function parseCalendar(input: string): ParsedCalendar {
   if (!hasCalendar) throw new Error('This does not look like an ICS calendar. It needs BEGIN:VCALENDAR.');
 
   const blocks: string[][] = [];
+  const timezoneBlocks: string[][] = [];
   let current: string[] | null = null;
+  let currentTimezone: string[] | null = null;
   for (const line of lines) {
-    if (line.toUpperCase() === 'BEGIN:VEVENT') current = [];
+    if (line.toUpperCase() === 'BEGIN:VTIMEZONE') currentTimezone = [line];
+    else if (currentTimezone) {
+      currentTimezone.push(line);
+      if (line.toUpperCase() === 'END:VTIMEZONE') {
+        timezoneBlocks.push(currentTimezone);
+        currentTimezone = null;
+      }
+    } else if (line.toUpperCase() === 'BEGIN:VEVENT') current = [];
     else if (line.toUpperCase() === 'END:VEVENT' && current) {
       blocks.push(current);
       current = null;
@@ -230,7 +263,15 @@ export function parseCalendar(input: string): ParsedCalendar {
   const globalRepairs: string[] = [];
   if (input.includes('\n') && !input.includes('\r\n')) globalRepairs.push('Normalized line endings for calendar apps.');
   const events = blocks.map((sourceLines, index): CalendarEvent => {
-    const properties = sourceLines.map(parseProperty).filter((value): value is Property => Boolean(value));
+    const properties: Property[] = [];
+    let nestedDepth = 0;
+    for (const line of sourceLines) {
+      const property = parseProperty(line);
+      if (!property) continue;
+      if (property.name === 'BEGIN') nestedDepth += 1;
+      else if (property.name === 'END') nestedDepth = Math.max(0, nestedDepth - 1);
+      else if (nestedDepth === 0) properties.push(property);
+    }
     const first = (name: string) => properties.find((property) => property.name === name);
     const repairs: string[] = [];
     const startProperty = first('DTSTART');
@@ -242,6 +283,10 @@ export function parseCalendar(input: string): ParsedCalendar {
     if (!end) {
       end = addDefaultEnd(start);
       repairs.push(`Added a missing end (${start.allDay ? 'next day' : 'one hour later'}).`);
+    }
+    if (wallTimeToDate(end).getTime() <= wallTimeToDate(start).getTime()) {
+      end = addDefaultEnd(start);
+      repairs.push(`Replaced an end time that was not after the start (${start.allDay ? 'next day' : 'one hour later'}).`);
     }
     const uid = textValue(first('UID')?.value) || `event-${index + 1}-${hash(sourceLines.join('\n'))}@ics-rescue.local`;
     if (!first('UID')) repairs.push('Added a stable event ID.');
@@ -257,6 +302,7 @@ export function parseCalendar(input: string): ParsedCalendar {
       url: first('URL')?.value ?? '',
       rrule: first('RRULE')?.value,
       sourceLines,
+      timezoneBlocks,
       repairs,
     };
   });

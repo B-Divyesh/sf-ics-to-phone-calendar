@@ -32,7 +32,7 @@ Color is never the only state signal; every status has an icon and text.
 
 ## Spacing and composition
 
-An 8 px base rhythm with half-step 4 px accents. Major sections use 64–112 px vertical breathing room. The desktop opening is an asymmetric editorial spread (copy 7/12, art 5/12); the phone version drops the extended scene crop, stacks the art below the promise, and keeps the import control in the first viewport. Independent events are cards; instructions are grouped by proximity without card chrome.
+An 8 px base rhythm with half-step 4 px accents. Major sections use 64–112 px vertical breathing room. The desktop opening is an asymmetric editorial spread (copy 7/12, art 5/12); the phone version drops the extended scene crop to a 150 px story strip below the promise, keeping the import control at the edge of the first viewport. Independent events are cards; instructions are grouped by proximity without card chrome.
 
 Corners are mostly 18–28 px, like clipped ticket stock. Fine 1 px ink rules and offset shadows evoke print registration. Touch targets are at least 44 px.
 

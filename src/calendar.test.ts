@@ -66,5 +66,33 @@ describe('parseCalendar', () => {
     expect(() => parseCalendar('hello')).toThrow('BEGIN:VCALENDAR');
     expect(() => parseCalendar(base('METHOD:PUBLISH'))).toThrow('No events');
     expect(() => parseCalendar(base('BEGIN:VEVENT\nSUMMARY:Lost'))).toThrow('END:VEVENT');
+    expect(() => parseCalendar(base('BEGIN:VEVENT\nDTSTART:20261340T250000Z\nEND:VEVENT'))).toThrow('not valid');
+  });
+
+  it('flags an unknown time zone and repairs an impossible end', () => {
+    const parsed = parseCalendar(base([
+      'BEGIN:VEVENT', 'SUMMARY:Review me',
+      'DTSTART;TZID=Mars/Olympus:20260827T120000',
+      'DTEND;TZID=Mars/Olympus:20260827T110000', 'END:VEVENT',
+    ].join('\n')));
+    expect(parsed.events[0].start.tzid).toBeUndefined();
+    expect(parsed.events[0].end.raw).toBe('20260827T130000');
+    expect(parsed.events[0].repairs.join(' ')).toContain('review this event’s local time');
+    expect(parsed.events[0].repairs.join(' ')).toContain('not after the start');
+  });
+
+  it('keeps embedded time-zone definitions and complete alarms', () => {
+    const parsed = parseCalendar(base([
+      'BEGIN:VTIMEZONE', 'TZID:America/New_York', 'BEGIN:STANDARD',
+      'DTSTART:19701101T020000', 'TZOFFSETFROM:-0400', 'TZOFFSETTO:-0500',
+      'END:STANDARD', 'END:VTIMEZONE',
+      'BEGIN:VEVENT', 'UID:alarm@example.com', 'SUMMARY:Wake up',
+      'DTSTART;TZID=America/New_York:20261102T070000',
+      'DTEND;TZID=America/New_York:20261102T073000',
+      'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:Wake up', 'TRIGGER:-PT10M', 'END:VALARM',
+      'END:VEVENT',
+    ].join('\n')));
+    expect(parsed.fixedIcs).toContain('BEGIN:VTIMEZONE\r\nTZID:America/New_York');
+    expect(parsed.fixedIcs).toContain('BEGIN:VALARM\r\nACTION:DISPLAY\r\nDESCRIPTION:Wake up\r\nTRIGGER:-PT10M\r\nEND:VALARM');
   });
 });
