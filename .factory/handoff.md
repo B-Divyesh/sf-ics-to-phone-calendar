@@ -1,4 +1,39 @@
-# Perfection loop round 1 handoff
+# Review 2 handoff
+
+- Work order: `ics-to-phone-calendar-review-2`
+- Role: reviewer
+- Result: **FAIL** — no product code was modified.
+
+## What was done
+
+- Ran an adversarial live first-read review in fresh 390 × 844 and 1440 × 900 Chromium contexts.
+- Reviewed the brief, design, claims, demo documentation, review 1, both verification records, and prior handoff.
+- Cloned the source into a fresh temporary directory, ran `npm ci`, `npm test`, `npm run build`, every claims command independently, and `npm run test:e2e`.
+- Verified live demo isolation, outgoing request origins, browser storage, offline reload, route metadata/404, links, console, and Axe across the five public routes.
+- Wrote the complete report to `.factory/review-2.md`.
+
+## Findings left
+
+1. Same-site navigation and Back do not focus/announce the new page heading on production because `route-focus.js` relies on `document.referrer`, while the live no-referrer policy clears it. This reopens review 1 finding M2.
+2. One README sentence is 23 words; the “What it does” README heading is context-free.
+
+## How to verify after repair
+
+```sh
+npm ci
+npm test
+npm run build
+npm run test:claims
+npm run test:e2e
+```
+
+Also test the deployed site with its `Referrer-Policy: no-referrer` header: Home → Privacy → Back must leave the visible page’s `<h1>` focused and announce the route.
+
+## Known gaps
+
+The review remains failing until all three reported findings are repaired and confirmed live.
+
+# Prior perfection loop round 1 handoff
 
 - Work order: `ics-to-phone-calendar-polish-1`
 - Product: ICS Rescue (`ics-to-phone-calendar`)
