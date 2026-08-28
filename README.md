@@ -30,8 +30,6 @@ Calendar input stays in browser memory. Google or Microsoft receives event detai
 
 ## Develop
 
-Use Node.js 20 or newer.
-
 ```sh
 npm ci
 npm run dev
@@ -50,7 +48,7 @@ The browser version is pinned to Playwright 1.58.2. If its Chromium binary is mi
 
 ## Deploy
 
-Run `npm run build`, then deploy `dist/` as an Azure Static Web App. The repository needs no runtime secret or server process.
+Run `npm run build`, then deploy `dist/` as an Azure Static Web App.
 
 ## Project notes
 

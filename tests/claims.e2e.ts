@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import jsQR from 'jsqr';
+import { parseCalendar } from '../src/calendar';
 
 const demoUrl = 'http://127.0.0.1:4173/?demo=1';
 
@@ -11,6 +12,13 @@ async function downloadedText(download: import('@playwright/test').Download): Pr
 }
 
 test('@claim:calendar-outputs creates working calendar files and provider links', async ({ page }) => {
+  await page.addInitScript(() => {
+    const createObjectUrl = URL.createObjectURL.bind(URL);
+    URL.createObjectURL = (object: Blob | MediaSource) => {
+      (window as Window & { __downloadMime?: string }).__downloadMime = object instanceof Blob ? object.type : '';
+      return createObjectUrl(object);
+    };
+  });
   await page.goto(demoUrl);
   await expect(page.locator('.event-card')).toHaveCount(3);
 
@@ -19,6 +27,8 @@ test('@claim:calendar-outputs creates working calendar files and provider links'
   const apple = await appleDownload;
   expect(apple.suggestedFilename()).toBe('neighborhood-garden-planning.ics');
   const appleIcs = await downloadedText(apple);
+  expect(await page.evaluate(() => (window as Window & { __downloadMime?: string }).__downloadMime)).toBe('text/calendar;charset=utf-8');
+  expect(parseCalendar(appleIcs).events).toHaveLength(1);
   expect(appleIcs).toContain('SUMMARY:Neighborhood garden planning\r\n');
   expect(appleIcs).toContain('RRULE:FREQ=WEEKLY;COUNT=3\r\n');
 
@@ -33,10 +43,15 @@ test('@claim:calendar-outputs creates working calendar files and provider links'
   expect(outlook.origin).toBe('https://outlook.live.com');
   expect(outlook.searchParams.get('subject')).toBe('Neighborhood garden planning');
   expect(outlook.searchParams.get('startdt')).toBe('2026-09-02T22:30:00.000Z');
+  expect(outlook.searchParams.get('enddt')).toBe('2026-09-02T23:30:00.000Z');
+  expect(outlook.searchParams.get('location')).toBe('Maple Street greenhouse');
+  expect(outlook.searchParams.get('body')).toBe('Choose autumn plots and share watering dates.');
+  expect(outlook.searchParams.has('recur')).toBe(false);
 
   const allDownload = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Download repaired ICS' }).click();
   const allIcs = await downloadedText(await allDownload);
+  expect(parseCalendar(allIcs).events).toHaveLength(3);
   expect(allIcs.match(/BEGIN:VEVENT/g)).toHaveLength(3);
   expect(allIcs).not.toMatch(/(?<!\r)\n/);
   expect(allIcs).toContain('DTSTART;VALUE=DATE:20260905\r\n');
@@ -60,6 +75,20 @@ test('@claim:repair-matrix repairs and preserves the sample calendar exactly', a
   expect(fixed).toContain('DESCRIPTION:Choose autumn plots and share watering dates.\r\n');
   expect(fixed).toContain('RRULE:FREQ=WEEKLY;COUNT=3\r\n');
   expect(fixed).toContain('URL:https://example.com/concert-details\r\n');
+
+  await page.getByRole('button', { name: 'Clear this calendar' }).click();
+  await page.locator('#ics-text').fill([
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'BEGIN:VEVENT',
+    'DTSTART;TZID=Mars/Olympus:20260912T120000',
+    'DTEND;TZID=Mars/Olympus:20260912T110000',
+    'END:VEVENT', 'END:VCALENDAR',
+  ].join('\n'));
+  await page.getByRole('button', { name: 'Show calendar events' }).click();
+  await expect(page.locator('#repair-summary')).toContainText('Fixed text formatting required by calendar apps.');
+  await expect(page.locator('.repair-list')).toContainText('Removed the unrecognized time zone “Mars/Olympus”');
+  await expect(page.locator('.repair-list')).toContainText('Replaced an end time that was not after the start');
+  await expect(page.locator('.repair-list')).toContainText('Added the unique event identifier required by calendar apps.');
+  await expect(page.locator('.event-title')).toHaveText('Untitled event');
 });
 
 test('@claim:local-private-flow keeps entered calendar data off the network and storage', async ({ page, context }) => {
