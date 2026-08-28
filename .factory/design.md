@@ -2,7 +2,7 @@
 
 ## Direction and rationale
 
-The product uses **surreal editorial scenery**: a cream paper event ticket crosses a coral aperture into a midnight-blue phone-calendar garden. The scene turns the invisible job—repairing a tiny text file so a phone can accept it—into one clear physical metaphor. The interface itself stays calm and tool-like; the surreal world appears at the opening and in small botanical/astronomical details, never behind form text.
+The product uses **surreal editorial scenery**: a cream paper event ticket crosses a coral aperture into a midnight-blue phone-calendar garden. The scene turns the invisible job—repairing a tiny text file so a phone can accept it—into one clear physical metaphor. The interface itself stays calm and tool-like; the surreal world appears in a short opening strip on phones and in small botanical details, never behind form text. Keeping the mobile crop short leaves both first actions inside a 390 × 844 first screen.
 
 This is a deliberately single-mode, warm-light experience. A dark theme would invert the paper metaphor and weaken recognition of the drop surface, so the page explicitly paints every background.
 
@@ -40,7 +40,7 @@ Corners are mostly 18–28 px, like clipped ticket stock. Fine 1 px ink rules an
 
 - The dashed drop field is the single gateway. Dragging a file moves its inner paper edge inward and changes the explicit label to “Drop it here.”
 - Parsing reveals an event ledger directly below the gateway. Status lines explain repairs before actions appear.
-- Provider actions are verb-led and consistent: “Add to Apple”, “Open in Google”, “Open in Outlook”. Apple generates a fresh standards-compliant ICS download because public `webcal://` requires hosting user data, which this product refuses to do.
+- Provider actions name the observable result: “Download ICS for Apple”, “Open in Google”, “Open in Outlook”, and “Show QR code”. Apple generates a fresh ICS download; the interface does not promise a direct calendar add.
 - A “Start over” action returns to the empty state; file input, paste area, and keyboard paste all converge on the same parser.
 
 ## Motion
@@ -60,3 +60,9 @@ On first paint, copy and hero fade/translate 10 px over 260 ms. Event cards ente
 - Review checklist: no people/anatomy; no brands or recognizable UI; no legible/generated text; portal and paper path read clearly; palette matches tokens; no misleading product function.
 
 Hand-authored SVG icons in the UI use simple original line geometry and are part of the source code; there is no third-party icon set.
+
+### Metadata crops
+
+- `public/social-card.jpg` is a 1200 × 630 center crop of the commissioned calendar-garden artwork, created with ImageMagick on 2026-08-28.
+- `public/apple-touch-icon.png` is a 180 × 180 center crop of the same original artwork, created with ImageMagick on 2026-08-28.
+- Both inherit the source artwork’s prompt, model, provenance, and license above. No new generated content or third-party material was added.

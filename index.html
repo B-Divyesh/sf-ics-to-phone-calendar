@@ -4,31 +4,52 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#f4ecdd" />
-    <meta name="description" content="Repair an ICS file locally and add its events to Apple, Google, or Outlook Calendar." />
-    <title>ICS Rescue — Add an ICS event to your phone calendar</title>
+    <meta name="description" content="Repair an ICS invite and download it for Apple Calendar or open it in Google and Outlook." />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ICS Rescue" />
+    <meta property="og:title" content="ICS Rescue — Add ICS invites to phone calendars" />
+    <meta property="og:description" content="Repair an ICS invite and choose an Apple, Google, or Outlook calendar option." />
+    <meta property="og:url" content="https://ics-to-phone-calendar.sociobot.in/" />
+    <meta property="og:image" content="https://ics-to-phone-calendar.sociobot.in/social-card.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ICS Rescue — Add ICS invites to phone calendars" />
+    <meta name="twitter:description" content="Repair an ICS invite and choose an Apple, Google, or Outlook calendar option." />
+    <meta name="twitter:image" content="https://ics-to-phone-calendar.sociobot.in/social-card.jpg" />
+    <title>ICS Rescue — Add ICS invites to phone calendars</title>
+    <link rel="canonical" href="https://ics-to-phone-calendar.sociobot.in/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
     <link rel="manifest" href="/manifest.webmanifest" />
   </head>
   <body>
-    <a class="skip-link" href="#main">Skip to calendar converter</a>
+    <a class="skip-link" href="#main">Skip to ICS converter</a>
+    <aside id="demo-banner" class="demo-banner" aria-label="Demo mode" hidden>
+      <strong>Demo — sample data, nothing is saved</strong>
+      <span class="demo-actions"><button id="reset-demo" type="button">Reset demo</button><a href="/">Start for real</a></span>
+    </aside>
     <header class="site-header" aria-label="Site header">
       <a class="wordmark" href="/" aria-label="ICS Rescue home">
         <svg aria-hidden="true" viewBox="0 0 36 36"><path d="M9 5v5m18-5v5M6 14h24M8 8h20a2 2 0 0 1 2 2v18a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2Z"/><path d="m13 22 3 3 7-8"/></svg>
         <span>ICS <em>Rescue</em></span>
       </a>
-      <a class="privacy-link" href="#privacy-note">Private by design</a>
+      <nav aria-label="Primary navigation"><a href="/demo">Demo</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a></nav>
     </header>
+    <div id="route-status" class="sr-only" aria-live="polite"></div>
 
     <main id="main">
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow"><span aria-hidden="true">✦</span> Your event has somewhere to go</p>
-          <h1 id="hero-title">Turn a stuck <span>.ics</span> into a calendar event.</h1>
-          <p class="lede">Drop or paste the invite. We repair common file problems and give you clean Apple, Google, and Outlook actions—right here on your device.</p>
-          <ul class="trust-list" aria-label="Product benefits">
-            <li><span aria-hidden="true">✓</span> Nothing is uploaded</li>
-            <li><span aria-hidden="true">✓</span> Multiple events welcome</li>
-            <li><span aria-hidden="true">✓</span> Time zones preserved</li>
+          <p class="eyebrow"><span aria-hidden="true">✦</span> For invites that open but will not import</p>
+          <h1 id="hero-title" tabindex="-1">Add an ICS invite to your phone calendar.</h1>
+          <p class="lede">For iPhone users whose invite opens but will not import, and for people sending those invites.</p>
+          <div class="hero-actions"><a class="button primary" href="/?demo=1">Try it with sample data</a><label class="button quiet" for="file-input">Choose an ICS file</label></div>
+          <p class="outcome-note">Shows repaired events and Apple, Google, and Outlook options.</p>
+          <ul class="trust-list" aria-label="Product facts">
+            <li><span aria-hidden="true">✓</span> No account or upload</li>
+            <li><span aria-hidden="true">✓</span> Works offline after the first visit</li>
+            <li><span aria-hidden="true">✓</span> Free</li>
           </ul>
         </div>
         <picture class="hero-art">
@@ -39,100 +60,43 @@
       </section>
 
       <section class="converter" aria-labelledby="converter-title">
-        <div class="section-heading">
-          <p class="step-label">01 / Bring the invite</p>
-          <h2 id="converter-title">Open your calendar file</h2>
-          <p>Choose the route that is easiest on this device.</p>
-        </div>
-
-        <div id="offline-notice" class="offline-notice" role="status" hidden>
-          <span aria-hidden="true">◌</span>
-          You’re offline. File repair and Apple downloads still work; Google and Outlook open when you reconnect.
-        </div>
-
+        <div class="section-heading"><p class="step-label">01 / Add the ICS</p><h2 id="converter-title">Open an ICS file</h2><p>Choose an ICS file or paste its text.</p></div>
+        <div id="offline-notice" class="offline-notice" role="status" hidden><span aria-hidden="true">◌</span> You’re offline. Repair and ICS downloads still work. Reconnect before opening Google or Outlook.</div>
         <div id="import-panel" class="import-panel">
           <div id="drop-zone" class="drop-zone">
             <input id="file-input" type="file" accept=".ics,text/calendar" />
-            <div class="drop-icon" aria-hidden="true">
-              <svg viewBox="0 0 48 48"><path d="M10 8h28v32H10z"/><path d="M16 5v8m16-8v8M10 17h28M17 28h14m-7-7v14"/></svg>
-            </div>
-            <h3 id="drop-title">Drop your .ics here</h3>
-            <p>or choose it from Files, Mail, or Downloads</p>
-            <label class="button primary" for="file-input">Choose an ICS file</label>
-            <p class="file-note">Up to 2 MB · stays on this device</p>
+            <div class="drop-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M10 8h28v32H10z"/><path d="M16 5v8m16-8v8M10 17h28M17 28h14m-7-7v14"/></svg></div>
+            <h3 id="drop-title">Drop your ICS file here</h3><p>or choose it from Files, Mail, or Downloads</p>
+            <label class="button primary" for="file-input">Choose an ICS file</label><p class="file-note">Reads up to 100 events or 2 MB.</p>
           </div>
-
           <div class="or-line"><span>or paste its text</span></div>
-
-          <div class="paste-group">
-            <label for="ics-text">ICS calendar text</label>
-            <textarea id="ics-text" rows="7" spellcheck="false" autocapitalize="off" placeholder="BEGIN:VCALENDAR&#10;VERSION:2.0&#10;BEGIN:VEVENT&#10;…"></textarea>
-            <button id="parse-button" class="button secondary" type="button">Read pasted calendar</button>
-          </div>
+          <div class="paste-group"><label for="ics-text">ICS text</label><textarea id="ics-text" rows="7" spellcheck="false" autocapitalize="off" placeholder="BEGIN:VCALENDAR&#10;VERSION:2.0&#10;BEGIN:VEVENT&#10;…"></textarea><button id="parse-button" class="button secondary" type="button">Show calendar events</button></div>
         </div>
-
-        <div id="error-box" class="message error-message" role="alert" tabindex="-1" hidden>
-          <span class="message-icon" aria-hidden="true">!</span>
-          <div><strong>We couldn’t read that calendar.</strong><p id="error-text"></p></div>
-          <button id="error-close" type="button" aria-label="Dismiss error">×</button>
-        </div>
-
+        <div id="error-box" class="message error-message" role="alert" tabindex="-1" hidden><span class="message-icon" aria-hidden="true">!</span><div><strong>We couldn’t read that ICS.</strong><p id="error-text"></p></div><button id="error-close" type="button" aria-label="Dismiss error">×</button></div>
         <section id="results" class="results" aria-labelledby="results-title" hidden>
-          <div class="results-heading">
-            <div>
-              <p class="step-label">02 / Choose a calendar</p>
-              <h2 id="results-title">Your events are ready</h2>
-              <p id="results-summary" class="results-summary" aria-live="polite"></p>
-            </div>
-            <button id="start-over" class="text-button" type="button">Start over</button>
-          </div>
-          <div id="repair-summary" class="message success-message" role="status"></div>
-          <div id="event-list" class="event-list"></div>
-          <div class="all-actions">
-            <div>
-              <h3>Need the whole calendar?</h3>
-              <p>Keep every event and repair in one clean file.</p>
-            </div>
-            <button id="download-all" class="button secondary" type="button">Download fixed .ics</button>
-            <button id="share-all" class="button quiet" type="button" hidden>Share fixed .ics</button>
-          </div>
+          <div class="results-heading"><div><p class="step-label">02 / Choose a calendar</p><h2 id="results-title" tabindex="-1">Review your events</h2><p id="results-summary" class="results-summary" aria-live="polite"></p></div><button id="start-over" class="text-button" type="button">Clear this calendar</button></div>
+          <div id="repair-summary" class="message success-message" role="status"></div><div id="event-list" class="event-list"></div>
+          <div class="all-actions"><div><h3>Keep the whole calendar</h3><p>Download every repaired event in one ICS file.</p></div><button id="download-all" class="button secondary" type="button">Download repaired ICS</button></div>
         </section>
       </section>
 
-      <section id="privacy-note" class="privacy-note" aria-labelledby="privacy-title">
-        <div class="privacy-orbit" aria-hidden="true"><span></span></div>
-        <div>
-          <p class="step-label">A quiet promise</p>
-          <h2 id="privacy-title">Your plans never leave the room.</h2>
-          <p>This converter runs entirely in your browser. We do not upload, store, inspect, or track calendar contents. Google and Outlook receive event details only if you choose their link.</p>
-        </div>
+      <section class="how-it-works" aria-labelledby="how-title">
+        <div class="section-heading"><p class="step-label">What happens</p><h2 id="how-title">How ICS repair works</h2></div>
+        <ol><li><span>1</span><div><h3>Read in your browser</h3><p>Open an ICS file or paste ICS text. No account is needed.</p></div></li><li><span>2</span><div><h3>Repair common errors</h3><p>Fix text formatting, end times, event IDs, and common Windows time zones.</p></div></li><li><span>3</span><div><h3>Choose a calendar</h3><p>Download an ICS file or open a Google or Outlook link.</p></div></li></ol>
       </section>
 
-      <section class="how-it-works" aria-labelledby="how-title">
-        <div class="section-heading"><p class="step-label">What happens</p><h2 id="how-title">A small repair, not a sync.</h2></div>
-        <ol>
-          <li><span>1</span><div><h3>Read locally</h3><p>Your browser opens the text. No account or upload.</p></div></li>
-          <li><span>2</span><div><h3>Mend safely</h3><p>We normalize line endings, missing end times, IDs, and common time-zone names.</p></div></li>
-          <li><span>3</span><div><h3>Hand it onward</h3><p>Use a provider link, scan a QR, or keep the repaired ICS.</p></div></li>
-        </ol>
+      <section id="privacy-note" class="privacy-note" aria-labelledby="privacy-title">
+        <div class="privacy-orbit" aria-hidden="true"><span></span></div><div><p class="step-label">Your calendar data</p><h2 id="privacy-title">Nothing is sent while you repair.</h2><p>ICS Rescue does not upload or save calendar data. Google or Microsoft receives event details only after you open its link.</p></div>
       </section>
     </main>
 
-    <dialog id="qr-dialog" aria-labelledby="qr-title">
-      <button id="qr-close" class="dialog-close" type="button" aria-label="Close QR code">×</button>
-      <p class="step-label">Phone handoff</p>
-      <h2 id="qr-title">Scan to add in Google Calendar</h2>
-      <p id="qr-event-name"></p>
-      <div id="qr-canvas" class="qr-canvas" aria-label="QR code"></div>
-      <p class="dialog-note">The event is encoded in this QR. It is generated on this device and not uploaded by us.</p>
-    </dialog>
+    <dialog id="qr-dialog" aria-labelledby="qr-title"><button id="qr-close" class="dialog-close" type="button" aria-label="Close QR code">×</button><p class="step-label">Open on another phone</p><h2 id="qr-title">Scan the Google Calendar link</h2><p id="qr-event-name"></p><div id="qr-canvas" class="qr-canvas" aria-label="QR code"></div><p class="dialog-note">The QR contains this event’s Google Calendar link.</p></dialog>
 
     <footer>
-      <div class="footer-brand"><span>ICS <em>Rescue</em></span><p>A tiny local-first tool from the Sociobot utility garden.</p></div>
-      <nav aria-label="Footer"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://sociobot.in">Sociobot</a></nav>
-      <p class="generated-note">Hero artwork was generated for this product with AI.</p>
+      <div class="footer-brand"><span>ICS <em>Rescue</em></span><p>Repair ICS files in your browser.</p></div>
+      <nav aria-label="Footer"><a href="/demo">Demo</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a></nav>
+      <p class="build-note">Built by Param Factory · Version 1.1.0</p><p class="generated-note">The calendar-garden artwork was generated for this product with AI.</p>
     </footer>
-
-    <script type="module" src="/src/main.ts"></script>
+    <script type="module" src="/src/main.ts"></script><script src="/route-focus.js" defer></script>
   </body>
 </html>

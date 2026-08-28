@@ -120,7 +120,7 @@ function normalizeDate(prop: Property, repairs: string[]): CalendarDate {
       tzid = repaired.zone;
     }
   }
-  if (!/^\d{8}(T\d{6}Z?)?$/.test(raw)) throw new Error(`A date has an unsupported value: ${raw || 'empty'}.`);
+  if (!/^\d{8}(T\d{6}Z?)?$/.test(raw)) throw new Error(`The date ${raw || 'empty'} is unsupported. Use YYYYMMDD or YYYYMMDDTHHMMSS, then try again.`);
   const [year, month, day, hour, minute, second] = parts(raw);
   const check = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
   if (check.getUTCFullYear() !== year || check.getUTCMonth() !== month - 1 || check.getUTCDate() !== day || hour > 23 || minute > 59 || second > 59) {
@@ -232,11 +232,11 @@ function serializeCalendar(events: CalendarEvent[]): string {
 }
 
 export function parseCalendar(input: string): ParsedCalendar {
-  if (!input.trim()) throw new Error('Paste calendar text or choose an .ics file first.');
+  if (!input.trim()) throw new Error('Paste ICS text or choose an ICS file first.');
   if (new Blob([input]).size > 2 * 1024 * 1024) throw new Error('That calendar is over 2 MB. Choose a smaller file.');
   const lines = unfold(input);
   const hasCalendar = lines.some((line) => line.toUpperCase() === 'BEGIN:VCALENDAR');
-  if (!hasCalendar) throw new Error('This does not look like an ICS calendar. It needs BEGIN:VCALENDAR.');
+  if (!hasCalendar) throw new Error('This is not an ICS calendar. Add BEGIN:VCALENDAR, then try again.');
 
   const blocks: string[][] = [];
   const timezoneBlocks: string[][] = [];
@@ -256,12 +256,12 @@ export function parseCalendar(input: string): ParsedCalendar {
       current = null;
     } else if (current) current.push(line);
   }
-  if (current) throw new Error('An event is incomplete: END:VEVENT is missing.');
-  if (!blocks.length) throw new Error('No events were found in this calendar.');
+  if (current) throw new Error('An event is missing END:VEVENT. Add it to the ICS text, then try again.');
+  if (!blocks.length) throw new Error('No events were found. Choose an ICS file that contains at least one VEVENT.');
   if (blocks.length > 100) throw new Error('This calendar has more than 100 events. Split it into smaller files first.');
 
   const globalRepairs: string[] = [];
-  if (input.includes('\n') && !input.includes('\r\n')) globalRepairs.push('Normalized line endings for calendar apps.');
+  if (input.includes('\n') && !input.includes('\r\n')) globalRepairs.push('Fixed text formatting required by calendar apps.');
   const events = blocks.map((sourceLines, index): CalendarEvent => {
     const properties: Property[] = [];
     let nestedDepth = 0;
@@ -275,7 +275,7 @@ export function parseCalendar(input: string): ParsedCalendar {
     const first = (name: string) => properties.find((property) => property.name === name);
     const repairs: string[] = [];
     const startProperty = first('DTSTART');
-    if (!startProperty) throw new Error(`Event ${index + 1} has no start date.`);
+    if (!startProperty) throw new Error(`Event ${index + 1} has no start date. Add DTSTART, then try again.`);
     const start = normalizeDate(startProperty, repairs);
     const endProperty = first('DTEND');
     const duration = first('DURATION')?.value;
@@ -289,9 +289,9 @@ export function parseCalendar(input: string): ParsedCalendar {
       repairs.push(`Replaced an end time that was not after the start (${start.allDay ? 'next day' : 'one hour later'}).`);
     }
     const uid = textValue(first('UID')?.value) || `event-${index + 1}-${hash(sourceLines.join('\n'))}@ics-rescue.local`;
-    if (!first('UID')) repairs.push('Added a stable event ID.');
+    if (!first('UID')) repairs.push('Added the unique event identifier required by calendar apps.');
     const summary = textValue(first('SUMMARY')?.value) || 'Untitled event';
-    if (!first('SUMMARY')) repairs.push('Named an untitled event.');
+    if (!first('SUMMARY')) repairs.push('Added the title “Untitled event.”');
     return {
       uid,
       summary,

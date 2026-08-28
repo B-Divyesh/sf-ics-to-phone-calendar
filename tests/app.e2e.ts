@@ -21,6 +21,9 @@ test('loads cleanly and passes an axe scan', async ({ page }) => {
   await expect(page).toHaveTitle(/ICS Rescue/);
   await expect(page.locator('h1')).toHaveCount(1);
   await expect(page.locator('main')).toHaveCount(1);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://ics-to-phone-calendar.sociobot.in/');
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /social-card\.jpg/);
+  await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute('href', '/apple-touch-icon.png');
   const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations.filter((item) => ['serious', 'critical'].includes(item.impact ?? ''))).toEqual([]);
   expect(errors).toEqual([]);
@@ -41,7 +44,7 @@ test('pastes, repairs, exports, and opens a QR', async ({ page }) => {
   const accessibility = await new AxeBuilder({ page }).analyze();
   expect(accessibility.violations.filter((item) => ['serious', 'critical'].includes(item.impact ?? ''))).toEqual([]);
   const downloadPromise = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'Download fixed .ics' }).click();
+  await page.getByRole('button', { name: 'Download repaired ICS' }).click();
   expect((await downloadPromise).suggestedFilename()).toBe('repaired-calendar.ics');
 });
 
@@ -49,7 +52,53 @@ test('works at 390px without horizontal overflow', async ({ page }, testInfo) =>
   test.skip(testInfo.project.name !== 'mobile');
   await page.goto('/');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+  const sampleAction = await page.getByRole('link', { name: 'Try it with sample data' }).boundingBox();
+  const realAction = await page.getByText('Choose an ICS file', { exact: true }).first().boundingBox();
+  expect(sampleAction?.y).toBeLessThan(844);
+  expect(realAction?.y).toBeLessThan(844);
   await page.setInputFiles('#file-input', { name: 'invite.ics', mimeType: 'text/calendar', buffer: Buffer.from(calendar) });
   await expect(page.locator('#results')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+});
+
+test('serves real demo, legal, and 404 routes with route focus', async ({ page }) => {
+  await page.goto('/demo');
+  await expect(page).toHaveTitle('Demo — ICS Rescue');
+  await expect(page.locator('#demo-banner')).toBeVisible();
+  await expect(page.locator('.event-card')).toHaveCount(3);
+
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Privacy' }).first().click();
+  await expect(page).toHaveURL(/\/privacy\/$/);
+  await expect(page).toHaveTitle('Privacy — ICS Rescue');
+  await expect(page.locator('h1')).toBeFocused();
+  await expect(page.getByRole('link', { name: 'Terms' }).first()).toBeVisible();
+
+  const response = await page.goto('/not-a-real-route');
+  expect(response?.status()).toBe(404);
+  await expect(page).toHaveTitle('Page not found — ICS Rescue');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('This invite took a wrong turn.');
+  await expect(page.getByRole('link', { name: 'Return to ICS Rescue' })).toBeVisible();
+});
+
+test('every route has metadata, landmarks, one h1, and no serious axe issue', async ({ page }) => {
+  for (const route of ['/', '/demo', '/privacy/', '/terms/', '/not-a-real-route']) {
+    const errors: string[] = [];
+    const listener = (message: import('@playwright/test').ConsoleMessage) => { if (message.type() === 'error') errors.push(message.text()); };
+    page.on('console', listener);
+    await page.goto(route);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    await expect(page.locator('main')).toHaveCount(1);
+    await expect(page.locator('h1')).toHaveCount(1);
+    expect(await page.title()).not.toBe('');
+    await expect(page.locator('meta[name="description"]')).toHaveCount(1);
+    await expect(page.locator('link[rel="canonical"]')).toHaveCount(1);
+    const accessibility = await new AxeBuilder({ page }).analyze();
+    expect(accessibility.violations.filter((item) => ['serious', 'critical'].includes(item.impact ?? '')), route).toEqual([]);
+    const unexpectedErrors = route === '/not-a-real-route'
+      ? errors.filter((message) => !message.includes('status of 404'))
+      : errors;
+    expect(unexpectedErrors, route).toEqual([]);
+    page.off('console', listener);
+  }
 });

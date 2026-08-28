@@ -1,0 +1,51 @@
+[
+  {
+    "id": "calendar-outputs",
+    "claim": "Creates repaired ICS downloads plus Google and Outlook calendar links.",
+    "where": "home first screen, event actions, README",
+    "test": "npm run test:claims -- --grep @claim:calendar-outputs",
+    "sandbox": "fresh Chromium context at /?demo=1; assert downloaded ICS fields and decoded provider URL fields"
+  },
+  {
+    "id": "repair-matrix",
+    "claim": "Fixes text formatting, missing end times, event IDs, and common Windows time zones while keeping supported event details.",
+    "where": "home how-it-works, result repairs, README",
+    "test": "npm run test:claims -- --grep @claim:repair-matrix",
+    "sandbox": "fresh Chromium context at /?demo=1; assert visible repairs and exact repaired ICS fields for recurring, all-day, and detailed events"
+  },
+  {
+    "id": "local-private-flow",
+    "claim": "Needs no account or payment and does not upload, save, track, or send calendar data before a provider link opens.",
+    "where": "home facts and privacy section, privacy page, README",
+    "test": "npm run test:claims -- --grep @claim:local-private-flow",
+    "sandbox": "fresh Chromium context at /?demo=1; exercise QR, private input, and download while intercepting requests and inspecting cookies, Cache Storage, IndexedDB, localStorage, and sessionStorage"
+  },
+  {
+    "id": "offline-reload",
+    "claim": "Works offline after the first visit for ICS repair and downloads.",
+    "where": "home fact and offline notice, README",
+    "test": "npm run test:claims -- --grep @claim:offline-reload",
+    "sandbox": "fresh Chromium context at /?demo=1; wait for service worker, switch context offline, reload, assert sample repair and downloaded ICS"
+  },
+  {
+    "id": "input-limits",
+    "claim": "Reads up to 100 events or 2 MB.",
+    "where": "home file input, README",
+    "test": "npm run test:claims -- --grep @claim:input-limits",
+    "sandbox": "fresh Chromium context at /?demo=1; assert 100 events and exactly 2 MiB pass, while 101 events and one byte over fail"
+  },
+  {
+    "id": "demo-sandbox",
+    "claim": "The demo is memory-only; reset restores the bundled sample and Start for real discards it.",
+    "where": "demo banner, privacy page, README",
+    "test": "npm run test:claims -- --grep @claim:demo-sandbox",
+    "sandbox": "fresh Chromium context at /?demo=1; alter sample, reset, assert fixture restoration, leave demo, and assert empty real state"
+  },
+  {
+    "id": "qr-payload",
+    "claim": "The QR code contains the event's Google Calendar link.",
+    "where": "QR dialog, README",
+    "test": "npm run test:claims -- --grep @claim:qr-payload",
+    "sandbox": "fresh Chromium context at /?demo=1; decode rendered QR pixels and compare the payload to the event's generated Google link"
+  }
+]

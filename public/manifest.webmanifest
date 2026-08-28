@@ -1,10 +1,13 @@
 {
   "name": "ICS Rescue",
   "short_name": "ICS Rescue",
-  "description": "Repair an ICS file locally and add it to your phone calendar.",
+  "description": "Repair an ICS invite and choose an Apple, Google, or Outlook calendar option.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f4ecdd",
   "theme_color": "#f4ecdd",
-  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
+  ]
 }

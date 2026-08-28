@@ -8,6 +8,7 @@ import {
   type CalendarEvent,
   type ParsedCalendar,
 } from './calendar';
+import { DEMO_ICS } from './demo';
 
 const element = <T extends HTMLElement>(id: string) => {
   const found = document.getElementById(id);
@@ -31,7 +32,8 @@ const offlineNotice = element<HTMLDivElement>('offline-notice');
 const qrDialog = element<HTMLDialogElement>('qr-dialog');
 const qrCanvas = element<HTMLDivElement>('qr-canvas');
 const qrEventName = element<HTMLParagraphElement>('qr-event-name');
-const shareAll = element<HTMLButtonElement>('share-all');
+const demoBanner = element<HTMLElement>('demo-banner');
+const demoMode = new URLSearchParams(location.search).get('demo') === '1' || /^\/demo\/?$/.test(location.pathname);
 
 let calendar: ParsedCalendar | null = null;
 let currentFilename = 'repaired-calendar.ics';
@@ -95,21 +97,6 @@ function actionLink(label: string, href: string, className: string): HTMLAnchorE
   return link;
 }
 
-async function shareOrDownloadEvent(event: CalendarEvent): Promise<void> {
-  const content = eventIcs(event);
-  const filename = safeFilename(event.summary);
-  const file = new File([content], filename, { type: 'text/calendar' });
-  try {
-    if (navigator.canShare?.({ files: [file] })) {
-      await navigator.share({ title: event.summary, files: [file] });
-      return;
-    }
-  } catch (error) {
-    if ((error as DOMException).name === 'AbortError') return;
-  }
-  download(content, filename);
-}
-
 function dateStamp(event: CalendarEvent): HTMLDivElement {
   const [year, month, day] = [event.start.raw.slice(0, 4), event.start.raw.slice(4, 6), event.start.raw.slice(6, 8)];
   const date = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
@@ -157,7 +144,9 @@ function eventCard(event: CalendarEvent, index: number): HTMLElement {
     const repaired = document.createElement('div');
     repaired.className = 'repair-list';
     const heading = document.createElement('p');
-    heading.innerHTML = '<strong>Repaired for you</strong>';
+    const strong = document.createElement('strong');
+    strong.textContent = 'Repairs made';
+    heading.append(strong);
     const list = document.createElement('ul');
     event.repairs.forEach((item) => {
       const line = document.createElement('li');
@@ -173,8 +162,8 @@ function eventCard(event: CalendarEvent, index: number): HTMLElement {
   const apple = document.createElement('button');
   apple.type = 'button';
   apple.className = 'button apple';
-  apple.append(svgIcon('apple'), document.createTextNode('Add to Apple'));
-  apple.addEventListener('click', () => shareOrDownloadEvent(event));
+  apple.append(svgIcon('apple'), document.createTextNode('Download ICS for Apple'));
+  apple.addEventListener('click', () => download(eventIcs(event), safeFilename(event.summary)));
   actions.append(apple);
   actions.append(actionLink('Open in Google', googleUrl(event), 'google'));
   actions.append(actionLink('Open in Outlook', outlookUrl(event), 'outlook'));
@@ -182,16 +171,15 @@ function eventCard(event: CalendarEvent, index: number): HTMLElement {
   const qr = document.createElement('button');
   qr.type = 'button';
   qr.className = 'button qr-button';
-  qr.title = 'Show QR code';
   qr.setAttribute('aria-label', `Show a QR code for ${event.summary}`);
-  qr.append(svgIcon('qr'));
+  qr.append(svgIcon('qr'), document.createTextNode('Show QR code'));
   qr.addEventListener('click', () => showQr(event));
   actions.append(qr);
   const providerNote = document.createElement('p');
   providerNote.className = 'provider-note';
   providerNote.textContent = event.rrule
-    ? 'Apple and Google preserve the repeat rule. Outlook opens the first occurrence for review.'
-    : 'Apple uses your phone’s share/download flow; iOS may ask you to confirm once more.';
+    ? 'The ICS and Google link include the repeat rule. Outlook opens the first occurrence.'
+    : 'Open the downloaded file in Apple Calendar. You may need to confirm before saving.';
   actions.append(providerNote);
   article.append(actions);
   return article;
@@ -211,7 +199,7 @@ async function showQr(event: CalendarEvent): Promise<void> {
   }
 }
 
-function render(parsed: ParsedCalendar): void {
+function render(parsed: ParsedCalendar, moveToResults = true): void {
   calendar = parsed;
   clearError();
   importPanel.hidden = true;
@@ -234,16 +222,17 @@ function render(parsed: ParsedCalendar): void {
   detail.textContent = messages.join(' ');
   copy.append(strong, detail);
   repairSummary.append(icon, copy);
-  if ('share' in navigator && typeof File !== 'undefined') shareAll.hidden = false;
-  results.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
-  results.querySelector<HTMLElement>('a, button')?.focus({ preventScroll: true });
+  if (moveToResults) {
+    results.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+    results.querySelector<HTMLElement>('a, button')?.focus({ preventScroll: true });
+  }
 }
 
-function processText(value: string, filename?: string): void {
+function processText(value: string, filename?: string, moveToResults = true): void {
   try {
     const parsed = parseCalendar(value);
     currentFilename = filename ? safeFilename(filename.replace(/\.ics$/i, ''), 'repaired-calendar') : 'repaired-calendar.ics';
-    render(parsed);
+    render(parsed, moveToResults);
   } catch (error) {
     showError(error);
   }
@@ -278,14 +267,14 @@ dropZone.addEventListener('dragleave', () => {
   if (dragDepth <= 0) {
     dragDepth = 0;
     dropZone.classList.remove('is-dragging');
-    dropTitle.textContent = 'Drop your .ics here';
+    dropTitle.textContent = 'Drop your ICS file here';
   }
 });
 dropZone.addEventListener('drop', (event) => {
   event.preventDefault();
   dragDepth = 0;
   dropZone.classList.remove('is-dragging');
-  dropTitle.textContent = 'Drop your .ics here';
+  dropTitle.textContent = 'Drop your ICS file here';
   processFile(event.dataTransfer?.files[0]);
 });
 
@@ -312,17 +301,6 @@ element<HTMLButtonElement>('start-over').addEventListener('click', () => {
 element<HTMLButtonElement>('download-all').addEventListener('click', () => {
   if (calendar) download(calendar.fixedIcs, currentFilename);
 });
-shareAll.addEventListener('click', async () => {
-  if (!calendar) return;
-  const file = new File([calendar.fixedIcs], currentFilename, { type: 'text/calendar' });
-  try {
-    if (navigator.canShare?.({ files: [file] })) await navigator.share({ title: 'Repaired calendar', files: [file] });
-    else download(calendar.fixedIcs, currentFilename);
-  } catch (error) {
-    if ((error as DOMException).name !== 'AbortError') download(calendar.fixedIcs, currentFilename);
-  }
-});
-
 element<HTMLButtonElement>('qr-close').addEventListener('click', () => qrDialog.close());
 qrDialog.addEventListener('click', (event) => {
   if (event.target === qrDialog) qrDialog.close();
@@ -337,6 +315,35 @@ function updateNetworkState(): void {
 window.addEventListener('online', updateNetworkState);
 window.addEventListener('offline', updateNetworkState);
 updateNetworkState();
+
+function enterDemo(moveToResults = true): void {
+  demoBanner.hidden = false;
+  document.body.classList.add('is-demo');
+  document.title = 'Demo — ICS Rescue';
+  document.querySelector<HTMLMetaElement>('meta[name="description"]')?.setAttribute('content', 'Try ICS Rescue with three sample events in a memory-only sandbox.');
+  document.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.setAttribute('href', 'https://ics-to-phone-calendar.sociobot.in/demo');
+  document.querySelector<HTMLMetaElement>('meta[property="og:url"]')?.setAttribute('content', 'https://ics-to-phone-calendar.sociobot.in/demo');
+  document.querySelector<HTMLMetaElement>('meta[property="og:title"]')?.setAttribute('content', 'Demo — ICS Rescue');
+  document.querySelector<HTMLMetaElement>('meta[property="og:description"]')?.setAttribute('content', 'Try ICS Rescue with three sample events in a memory-only sandbox.');
+  document.querySelector<HTMLMetaElement>('meta[name="twitter:title"]')?.setAttribute('content', 'Demo — ICS Rescue');
+  document.querySelector<HTMLMetaElement>('meta[name="twitter:description"]')?.setAttribute('content', 'Try ICS Rescue with three sample events in a memory-only sandbox.');
+  textarea.value = DEMO_ICS;
+  processText(DEMO_ICS, 'sample-calendar.ics', moveToResults);
+}
+
+element<HTMLButtonElement>('reset-demo').addEventListener('click', () => enterDemo());
+
+if (demoMode) {
+  enterDemo(false);
+  requestAnimationFrame(() => {
+    const previous = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = 'auto';
+    results.scrollIntoView({ block: 'start' });
+    document.documentElement.style.scrollBehavior = previous;
+    element<HTMLHeadingElement>('results-title').focus({ preventScroll: true });
+    element<HTMLElement>('route-status').textContent = 'Demo — ICS Rescue';
+  });
+}
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => undefined));
