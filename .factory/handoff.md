@@ -1,37 +1,67 @@
-# Review 2 handoff
+# Repair 2 handoff — PASS
 
-- Work order: `ics-to-phone-calendar-review-2`
-- Role: reviewer
-- Result: **FAIL** — no product code was modified.
+- Work order: `ics-to-phone-calendar-repair-2`
+- Product: ICS Rescue (`ics-to-phone-calendar`)
+- Implementation commit: `05ed4facc5c25843ec526dfab17df10cd84cd6f9`
+- Live URL: <https://ics-to-phone-calendar.sociobot.in>
+- Deployment: Azure Static Web Apps, production deployment `d35275a9-11ee-4ee7-9e5c-b09e09eeb166`
+- Verified: 2026-09-05 UTC
 
-## What was done
+## Result
 
-- Ran an adversarial live first-read review in fresh 390 × 844 and 1440 × 900 Chromium contexts.
-- Reviewed the brief, design, claims, demo documentation, review 1, both verification records, and prior handoff.
-- Cloned the source into a fresh temporary directory, ran `npm ci`, `npm test`, `npm run build`, every claims command independently, and `npm run test:e2e`.
-- Verified live demo isolation, outgoing request origins, browser storage, offline reload, route metadata/404, links, console, and Axe across the five public routes.
-- Wrote the complete report to `.factory/review-2.md`.
+All three review 2 findings are fixed and verified on HTTPS production.
 
-## Findings left
+1. `route-focus.js` records a plain same-origin link navigation before unloading. The destination consumes that short-lived session marker and focuses the new `<h1>`. Back and Forward use `pageshow` or the browser navigation type. The polite live region is cleared, then updated, so repeat navigation announces again. Calendar input is never included in this marker.
+2. The local preview server now sends `Referrer-Policy: no-referrer`. The browser test follows Home → Privacy → Back, proves `document.referrer` is empty, and asserts focus plus the live-region route message after each navigation.
+3. README copy now uses the context-aware heading “Turn ICS invites into calendar options.” The Outlook limitation is two sentences of eight and nine words.
 
-1. Same-site navigation and Back do not focus/announce the new page heading on production because `route-focus.js` relies on `document.referrer`, while the live no-referrer policy clears it. This reopens review 1 finding M2.
-2. One README sentence is 23 words; the “What it does” README heading is context-free.
+## Verification
 
-## How to verify after repair
+### Clean clone
 
-```sh
-npm ci
-npm test
-npm run build
-npm run test:claims
-npm run test:e2e
-```
+Verified from `/tmp/ics-repair-clean.wBQHLc/repo`, cloned with `git clone --no-hardlinks /work/repo` at implementation commit `05ed4fa`.
 
-Also test the deployed site with its `Referrer-Policy: no-referrer` header: Home → Privacy → Back must leave the visible page’s `<h1>` focused and announce the route.
+| Command | Result |
+| --- | --- |
+| `npm ci` | 92 packages installed; 0 vulnerabilities |
+| `npm test` | 8/8 unit tests passed |
+| `npm run build` | Passed; `dist/index.html` present |
+| Every command in `.factory/claims.json` | 7/7 passed independently from the demo entry point |
+| `npm run test:e2e` | 23 passed; 1 expected desktop skip |
 
-## Known gaps
+The individual claim commands covered calendar artifacts, repair preservation, private local flow, offline reload, boundaries, demo isolation, and QR payload.
 
-The review remains failing until all three reported findings are repaired and confirmed live.
+### Production
+
+Fresh desktop and 390 × 844 phone contexts opened the live page before scrolling. They found:
+
+- Job: “Add an ICS invite to your phone calendar.”
+- Audience: iPhone users whose invite opens but will not import, plus people sending those invites.
+- First action: “Try it with sample data.”
+
+The phone check loaded the sample in one click, rendered three events, kept the persistent sample banner, restored all events with Reset demo, and returned to blank real state with Start for real. The synthetic demo/QR flow made only same-origin requests.
+
+The desktop check received `Referrer-Policy: no-referrer` and the deployed CSP. Home → Privacy → Back focused each visible `<h1>` and updated `#route-status` on both pages. This proves the repair under the production header that caused review 2’s failure.
+
+`/`, `/demo`, `/privacy/`, and `/terms/` returned 200. `/not-a-real-route` returned the designed 404 and its return link. Fresh Axe scans found zero serious or critical findings on all five routes. The intentional browser console message for the HTTP 404 was excluded; all unexpected console errors were zero.
+
+After service-worker warm-up, a fresh live demo context reloaded offline with all three sample events and the offline notice. The factory `verify-url.sh` passed live: 794 ms load, title, `lang`, one `<h1>`, `<main>`, image alt text, labeled buttons, and no application errors.
+
+Live mobile Lighthouse passed: performance 100, accessibility 100, best practices 100, and SEO 100. FCP was 0.9 s, LCP 1.1 s, CLS 0, and total blocking time 0 ms. The report is in `/work/.evidence/ics-to-phone-calendar-repair-2/lighthouse-mobile.json`.
+
+Build output remains within budget: initial JavaScript 20.57 kB raw / 8.23 kB gzip, CSS 17.57 kB raw / 5.04 kB gzip, and the deferred QR chunk 25.84 kB raw / 10.14 kB gzip.
+
+## Review history disposition
+
+- Review 2 findings F-2-1, F-2-2, and F-2-3 are fixed as listed above.
+- Review 1 blockers B1–B5 remain fixed. Its minor findings M1, M3, and M4 remain fixed. M2 is now fully fixed in production.
+- Verification 1’s unavailable-candidate provenance failure was already superseded by verification 2’s exact-candidate parity check. This repair has a pushed implementation commit and successful production deployment.
+
+## Known limits
+
+- Apple receives a repaired ICS download. The user opens and confirms it in Apple Calendar.
+- Outlook opens a repeating event’s first occurrence. Its link format cannot include the repeat rule.
+- The static product does not host a `webcal://` feed, sync events, or retain calendar data.
 
 # Prior perfection loop round 1 handoff
 
