@@ -3,6 +3,7 @@
 - Work order: `ics-to-phone-calendar-repair-2`
 - Product: ICS Rescue (`ics-to-phone-calendar`)
 - Implementation commit: `05ed4facc5c25843ec526dfab17df10cd84cd6f9`
+- Verification record commit: `e50363672a663f050b024a590f933990992102ba`
 - Live URL: <https://ics-to-phone-calendar.sociobot.in>
 - Deployment: Azure Static Web Apps, production deployment `d35275a9-11ee-4ee7-9e5c-b09e09eeb166`
 - Verified: 2026-09-05 UTC
