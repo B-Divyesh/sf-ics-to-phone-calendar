@@ -16,6 +16,11 @@ export default defineConfig({
       });
     },
   }],
+  preview: {
+    headers: {
+      'Referrer-Policy': 'no-referrer',
+    },
+  },
   build: {
     target: 'es2022',
     outDir: 'dist',

@@ -67,11 +67,19 @@ test('serves real demo, legal, and 404 routes with route focus', async ({ page }
   await expect(page.locator('#demo-banner')).toBeVisible();
   await expect(page.locator('.event-card')).toHaveCount(3);
 
-  await page.goto('/');
+  const homeResponse = await page.goto('/');
+  expect(homeResponse?.headers()['referrer-policy']).toBe('no-referrer');
   await page.getByRole('link', { name: 'Privacy' }).first().click();
   await expect(page).toHaveURL(/\/privacy\/$/);
   await expect(page).toHaveTitle('Privacy — ICS Rescue');
+  expect(await page.evaluate(() => document.referrer)).toBe('');
   await expect(page.locator('h1')).toBeFocused();
+  await expect(page.locator('#route-status')).toHaveText('Privacy, in plain language.');
+
+  await page.goBack();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.locator('h1')).toBeFocused();
+  await expect(page.locator('#route-status')).toHaveText('Add an ICS invite to your phone calendar.');
   await expect(page.getByRole('link', { name: 'Terms' }).first()).toBeVisible();
 
   const response = await page.goto('/not-a-real-route');

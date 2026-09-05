@@ -6,7 +6,7 @@ Live: <https://ics-to-phone-calendar.sociobot.in>
 
 Demo: <https://ics-to-phone-calendar.sociobot.in/?demo=1>
 
-## What it does
+## Turn ICS invites into calendar options
 
 - Creates repaired ICS downloads plus Google and Outlook calendar links.
 - Fixes text formatting, missing end times, event IDs, and common Windows time zones.
@@ -16,7 +16,7 @@ Demo: <https://ics-to-phone-calendar.sociobot.in/?demo=1>
 - Needs no account or payment. It does not upload, save, track, or send calendar data before a provider link opens.
 - Encodes each event’s Google Calendar link in its QR code.
 
-The Apple action downloads an ICS file. Open that file in Apple Calendar and review it before saving. Outlook links open the first occurrence of a repeating event because the Outlook link format used here does not carry its repeat rule.
+The Apple action downloads an ICS file. Open that file in Apple Calendar and review it before saving. Outlook links open a repeating event’s first occurrence. Outlook’s link format cannot carry its repeat rule.
 
 ## Demo sandbox
 

@@ -1,6 +1,6 @@
 # Copy audit
 
-Audited 2026-08-28 with `Intl.Segmenter('en', { granularity: 'word' })`. Counts include word-like segments. No sentence exceeds 22 words. No copy uses: leverage, seamless, effortless, robust, powerful, intuitive, reimagine, supercharge, unlock, delightful, journey, ecosystem, or AI-powered.
+Audited 2026-09-05 with `Intl.Segmenter('en', { granularity: 'word' })`. Counts include word-like segments. No sentence exceeds 22 words. No copy uses: leverage, seamless, effortless, robust, powerful, intuitive, reimagine, supercharge, unlock, delightful, journey, ecosystem, or AI-powered.
 
 ## First screen and global shell
 
@@ -120,3 +120,34 @@ The Privacy, Terms, demo, and 404 pages were checked with the same rules. Their 
 | Google or Outlook result | calendar link |
 | Real-state reset | Clear this calendar |
 | Sample-state reset | Reset demo |
+
+## README
+
+| Words | Copy | Result |
+| ---: | --- | --- |
+| 12 | Repair ICS invites and open them in Apple, Google, or Outlook calendars. | Pass |
+| 13 | ICS Rescue is for iPhone users whose invites preview but will not import. | Pass |
+| 7 | It also helps people sending those invites. | Pass |
+| 10 | Creates repaired ICS downloads plus Google and Outlook calendar links. | Pass |
+| 13 | Fixes text formatting, missing end times, event IDs, and common Windows time zones. | Pass |
+| 12 | Keeps supported dates, locations, notes, URLs, all-day events, and repeat rules. | Pass |
+| 8 | Reads up to 100 events or 2 MB. | Pass |
+| 11 | Works offline after the first visit for ICS repair and downloads. | Pass |
+| 5 | Needs no account or payment. | Pass |
+| 15 | It does not upload, save, track, or send calendar data before a provider link opens. | Pass |
+| 10 | Encodes each event’s Google Calendar link in its QR code. | Pass |
+| 7 | The Apple action downloads an ICS file. | Pass |
+| 11 | Open that file in Apple Calendar and review it before saving. | Pass |
+| 8 | Outlook links open a repeating event’s first occurrence. | Pass |
+| 9 | Outlook’s link format cannot carry its repeat rule. | Pass |
+| 7 | `/?demo=1` loads three rendered sample events. | Pass |
+| 5 | `/demo` opens the same sandbox. | Pass |
+| 5 | The demo is memory-only. | Pass |
+| 12 | Reset demo restores the bundled sample, and Start for real discards it. | Pass |
+| 9 | See `.factory/demo.md` for the sample and isolation details. | Pass |
+| 13 | Every product claim and its exact sandbox command is registered in `.factory/claims.json`. | Pass |
+| 6 | Calendar input stays in browser memory. | Pass |
+| 13 | Google or Microsoft receives event details only after you open that provider’s link. | Pass |
+| 8 | The browser version is pinned to Playwright 1.58.2. | Pass |
+| 12 | If its Chromium binary is missing, run `npx playwright install chromium` once. | Pass |
+| 13 | Run `npm run build`, then deploy `dist/` as an Azure Static Web App. | Pass |
