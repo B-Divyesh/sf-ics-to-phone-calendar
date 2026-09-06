@@ -1,6 +1,6 @@
 # Copy audit
 
-Audited 2026-09-05 with `Intl.Segmenter('en', { granularity: 'word' })`. Counts include word-like segments. No sentence exceeds 22 words. No copy uses: leverage, seamless, effortless, robust, powerful, intuitive, reimagine, supercharge, unlock, delightful, journey, ecosystem, or AI-powered.
+Audited 2026-09-05 with `Intl.Segmenter('en', { granularity: 'word' })`. Rechecked unchanged product copy on 2026-09-06 during repair 3. Counts include word-like segments. No sentence exceeds 22 words. No copy uses: leverage, seamless, effortless, robust, powerful, intuitive, reimagine, supercharge, unlock, delightful, journey, ecosystem, or AI-powered.
 
 ## First screen and global shell
 
