@@ -1,27 +1,29 @@
-# Add an ICS invite to your phone calendar — repair 3 handoff
+# Add an ICS invite to your phone calendar — verification 4 handoff
 
-- Work order: `ics-to-phone-calendar-repair-3`
+- Work order: `ics-to-phone-calendar-verify-4`
 - Live URL: <https://ics-to-phone-calendar.sociobot.in>
-- Starting documentation SHA: `2508b466cf02a28e3135d59354f82f56d4598a1a`
-- Deployed implementation SHA: `ac282e20ef772fbc47d9065fd5a3e5198fb0debd`
+- Implementation reviewed: `ac282e20ef772fbc47d9065fd5a3e5198fb0debd`
+- Documentation baseline reviewed: `c3b4aea888669053e2936ba9d529ccbba12949bb`
 - Verified: 2026-09-06 UTC
 
-## Result: PASS
+## Result: FAIL
 
-The low-severity touch-target finding from verification 3 is fixed. No current finding remains open.
+One low-severity copy-contract finding remains open. Product code and deployment files were not changed by this verification.
 
-## What changed
+## Current finding
 
-- Header and footer navigation links now have centered hit areas of at least 44 by 44 CSS pixels in both application and legal-page styles.
-- Reset demo and Start for real are at least 44 pixels high on desktop as well as phone layouts.
-- The browser suite now measures rendered target rectangles on Home, Demo, Privacy, Terms, and 404 at desktop and phone widths. It also checks for horizontal overflow.
-- The service-worker cache advanced to `ics-rescue-v5`, so returning visitors receive the repaired shared styles.
+The live 404 page uses the metaphorical h1 “This invite took a wrong turn.” The plain-words contract requires a direct heading. Change it to a direct label such as “Page not found.” and rerun the live 404 route, keyboard return link, and title/one-h1 checks. This is the only current finding.
 
-The converter, sample data, provider URLs, generated files, visual system, public wording, and privacy boundary were not changed.
+## Verification performed
 
-## First screen and demo
+- `npm ci`, `npm test` (8/8), `npm run build`, all seven declared claim commands, and `npm run test:e2e` (25 passed, one expected skip) passed from the checkout.
+- Fresh desktop and phone live contexts confirmed the job, audience, and sample action before scrolling; populated demo output; persistent demo label; reset; real-state exit; routes; keyboard; focus; reduced motion; privacy; offline reload; and all 44 px targets.
+- All 21 public files from the implementation build match live HTTPS byte for byte. The active service-worker cache is `ics-rescue-v5`.
+- `/opt/fleet/lib/verify-url.sh` passed on the live landing page. Live Axe scans had no serious or critical issues.
 
-Fresh 1440 by 900 and 390 by 664 browser contexts opened at scroll position zero.
+## Product behavior confirmed
+
+Fresh 1440 by 900 and 390 by 844 browser contexts opened at scroll position zero.
 
 - Job: “Add an ICS invite to your phone calendar.”
 - Audience: iPhone users whose invite opens but will not import, plus people sending those invites.
@@ -33,7 +35,7 @@ Fresh 1440 by 900 and 390 by 664 browser contexts opened at scroll position zero
 - Start for real returned to an empty real-input state.
 - No real calendar data was used.
 
-## Finding disposition
+## Earlier finding disposition
 
 | Source | Finding | Current evidence |
 | --- | --- | --- |
@@ -48,35 +50,33 @@ Fresh 1440 by 900 and 390 by 664 browser contexts opened at scroll position zero
 | Review 2 F-2-2 and F-2-3 | README sentence length and heading wording | Remain fixed; the current copy audit has no sentence over 22 words and headings are contextual. |
 | Verification 1 | Requested implementation was unavailable | Superseded; the exact implementation above is pushed, deployed, and all 21 public build files match live HTTPS. |
 | Verification 2 | No defects in its earlier candidate | No regression found in its covered paths. |
+| Verification 4 F-4-1 | Metaphorical 404 heading | Open. Replace it with a direct plain-words heading. |
 
-## Clean-checkout verification
+## Commands to rerun after repair
 
-A new checkout at the exact implementation SHA used Node.js 22 and the documented setup.
+```sh
+npm ci
+npm test
+npm run build
+npm run test:claims
+npm run test:e2e
+/opt/fleet/lib/verify-url.sh https://ics-to-phone-calendar.sociobot.in /work/.evidence/ics-to-phone-calendar-verify-4
+```
 
-| Check | Result |
-| --- | --- |
-| `npm ci` | Pass; 92 packages installed and 0 vulnerabilities reported |
-| `npm test` | Pass; 8 of 8 unit tests |
-| `npm run build` | Pass; `dist/index.html` produced |
-| Seven commands from `.factory/claims.json` | Pass; each command ran independently |
-| `npm run test:e2e` | Pass; 25 passed and one expected desktop-only skip |
+Run every exact command in `.factory/claims.json` independently as part of claim verification. The known clean result is 8 unit tests, 7 independent claim tests, 25 browser tests, and one expected skip. Build budgets remain below the static-product limits.
 
-Build output remained within budget: initial JavaScript was 20.57 kB raw and 8.23 kB gzip; CSS was 17.65 kB raw and 5.04 kB gzip; the deferred QR chunk was 25.84 kB raw and 10.14 kB gzip. The 768-pixel AVIF hero remains 21.77 kB. There are no web fonts.
+## Live verification evidence
 
-## Live verification
-
-- The existing `sf-ics-to-phone-calendar` Static Web App in `eastus2` was reused. Both deployment uploads succeeded, and final HTTPS returned 200.
-- The factory URL verifier passed in 777 ms with no console errors, one `h1`, `lang=en`, a main landmark, image alternatives, and labelled buttons.
+- The factory URL verifier passed in 820 ms with no console errors, one `h1`, `lang=en`, a main landmark, image alternatives, and labelled buttons.
 - Fresh phone and desktop route checks covered Home, Demo, Privacy, Terms, and 404. Each had one `h1`, one `main`, the expected title/status, no horizontal overflow, and zero serious or critical Axe findings.
-- The demo and Apple-download flow made only same-origin requests. Local storage, session storage, IndexedDB, and cookies remained empty.
+- The demo and Apple-download flow made only same-origin requests. The claim suite found local storage, session storage, IndexedDB, and cookies empty.
 - A fresh service-worker context reloaded the three-event demo offline, showed the offline notice, and downloaded the Apple ICS. The active cache was `ics-rescue-v5`.
 - All 21 public files in the local build matched live HTTPS byte for byte. The deployment-only `staticwebapp.config.json` was excluded.
-- Live mobile Lighthouse scored 100 performance, 100 accessibility, 100 best practices, and 100 SEO. FCP was 1.0 seconds, LCP 1.1 seconds, total blocking time 30 ms, and CLS 0.
 
-Evidence is in `/work/.evidence/ics-to-phone-calendar-repair-3/`. The catalog description was copied to `/work/.evidence/catalog-description.txt` and matches `.factory/catalog-description.txt`.
+Evidence is in `/work/.evidence/ics-to-phone-calendar-verify-4/`. The detailed verification report is `.factory/verification-4.md`.
 
-## Known constraints and next steps
+## Known product constraints and next step
 
 Apple Calendar may still ask the user to confirm after opening the downloaded ICS file. Outlook links represent the first occurrence of repeating events because its link format cannot carry the repeat rule. Both limits are already stated in the product.
 
-This is a static, free product. Backend tenancy, SQLite persistence, health checks, rate limits, billing registration, and license validation do not apply. No follow-up repair is required from this work order.
+This is a static, free product. Backend tenancy, SQLite persistence, health checks, rate limits, billing registration, and license validation do not apply. The required next step is the one-line 404 heading repair described above; no other repair is indicated.
