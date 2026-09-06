@@ -65,7 +65,7 @@ img { display: block; max-width: 100%; }
 
 .demo-banner { position: sticky; z-index: 50; top: 0; min-height: 52px; padding: 6px max(16px, calc((100vw - 1240px) / 2)); display: flex; align-items: center; justify-content: space-between; gap: 16px; color: #fff; background: var(--night); border-bottom: 3px solid var(--coral); font-size: 14px; }
 .demo-actions { display: flex; align-items: center; gap: 12px; }
-.demo-actions button, .demo-actions a { min-height: 40px; padding: 7px 12px; border: 1px solid #b8c3cb; border-radius: 999px; color: #fff; background: transparent; cursor: pointer; font-weight: 750; text-decoration: none; }
+.demo-actions button, .demo-actions a { min-height: 44px; padding: 7px 12px; border: 1px solid #b8c3cb; border-radius: 999px; color: #fff; background: transparent; cursor: pointer; font-weight: 750; text-decoration: none; }
 .demo-actions button:hover, .demo-actions a:hover { background: #263e55; }
 
 .site-header {
@@ -78,7 +78,7 @@ img { display: block; max-width: 100%; }
   border-bottom: 1px solid var(--rule);
 }
 .site-header nav { display: flex; align-items: center; gap: 22px; }
-.site-header nav a { min-height: 44px; display: inline-flex; align-items: center; color: var(--slate); font-size: 15px; text-underline-offset: 4px; }
+.site-header nav a { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; color: var(--slate); font-size: 15px; text-underline-offset: 4px; }
 .wordmark {
   display: inline-flex;
   align-items: center;
@@ -288,7 +288,7 @@ footer { padding: 54px max(24px, calc((100vw - 1240px) / 2)); display: grid; gri
 .footer-brand > span { color: #fff; font-size: 20px; font-weight: 800; }
 .footer-brand p, .generated-note { margin: 8px 0 0; color: #abb9c4; }
 footer nav { display: flex; gap: 24px; align-items: start; }
-footer a { min-height: 44px; display: inline-flex; align-items: center; text-underline-offset: 4px; }
+footer a { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; text-underline-offset: 4px; }
 .build-note { margin: 0; color: #abb9c4; }
 .generated-note { grid-column: 1 / -1; margin: 0; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.16); }
 

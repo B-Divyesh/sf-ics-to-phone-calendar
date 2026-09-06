@@ -61,6 +61,29 @@ test('works at 390px without horizontal overflow', async ({ page }, testInfo) =>
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 });
 
+test('shared navigation and demo controls have 44px touch targets without overflow', async ({ page }) => {
+  for (const route of ['/', '/demo', '/privacy/', '/terms/', '/not-a-real-route']) {
+    await page.goto(route);
+    const controls = page.locator('header a, footer nav a, #demo-banner button, #demo-banner a').filter({ visible: true });
+    const count = await controls.count();
+    expect(count, `${route} should expose shared navigation controls`).toBeGreaterThan(0);
+
+    for (let index = 0; index < count; index += 1) {
+      const control = controls.nth(index);
+      const label = (await control.getAttribute('aria-label')) ?? (await control.innerText()).trim();
+      const box = await control.boundingBox();
+      expect(box, `${route} ${label} should have a rendered hit area`).not.toBeNull();
+      expect(box!.width, `${route} ${label} width`).toBeGreaterThanOrEqual(44);
+      expect(box!.height, `${route} ${label} height`).toBeGreaterThanOrEqual(44);
+    }
+
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
+      `${route} should not overflow horizontally`,
+    ).toBe(true);
+  }
+});
+
 test('serves real demo, legal, and 404 routes with route focus', async ({ page }) => {
   await page.goto('/demo');
   await expect(page).toHaveTitle('Demo — ICS Rescue');
