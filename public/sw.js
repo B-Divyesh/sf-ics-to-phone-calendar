@@ -1,4 +1,4 @@
-const CACHE = 'ics-rescue-v4';
+const CACHE = 'ics-rescue-v5';
 const STATIC_FILES = [
   '/', '/demo', '/manifest.webmanifest', '/favicon.svg', '/apple-touch-icon.png',
   '/hero-calendar-portal-768.avif', '/hero-calendar-portal-768.webp',
